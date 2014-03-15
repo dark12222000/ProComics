@@ -18,4 +18,106 @@ angular.module('micro').controller('pages', function($scope, $routeParams, $log)
 		//$scope.$apply();
 	}
 	
-}); //If you want to add more controllers, just remove the ';' and chain off of here.
+}).controller('comics', function($scope, $routeParams, $log, COMICS){
+	$scope.comics = COMICS;
+	//start at the latest entry
+	$scope.current = {arc: 0, chapter: 0, page: 0};
+	//accept any params info
+	if($routeParams.arc){
+		$scope.current['arc'] = Number($routeParams.arc);
+	}
+	if($routeParams.chapter){
+		$scope.current['chapter'] = Number($routeParams.chapter);
+	}
+	if($routeParams.page){
+		$scope.current['page'] = Number($routeParams.page);
+	}	
+
+	//save our arc-chapter-page
+	$scope.arc = $scope.comics.arcs[$scope.current.arc];
+	$scope.chapter = $scope.arc.chapters[$scope.current.chapter];
+	$scope.page = $scope.chapter.pages[$scope.current.page];
+
+	//first possible page
+	$scope.latest = function(){
+		return {arc: 0, chapter: 0, page: 0};
+	}
+	//Determine 'next' page
+	$scope.nextPage = function(){
+		var location = $scope.current;
+		var ret = {arc: false, chapter: false, page: false};
+		if(location.page > 0){
+			ret.arc = Number(location.arc);
+			ret.chapter = Number(location.chapter);
+			ret.page = Number(location.page - 1);
+			return ret;
+		}else{
+			if(location.chapter > 0){
+				ret.arc = Number(location.arc);
+				ret.chapter = Number(location.chapter - 1);
+				ret.page = Number($scope.comics.arcs[ret.arc].chapters[ret.chapter].pages.length - 1);
+				return ret;
+			}else if(location.arc > 0){
+				ret.arc = Number(location.arc - 1);
+				ret.chapter = Number($scope.comics.arcs[ret.arc].chapters.length - 1);
+				ret.page = Number($scope.comics.arcs[ret.arc].chapters[ret.chapter].pages.length - 1);
+				return ret;
+			}else{
+				return false;
+			}
+		}
+	}
+
+	//determine prev page
+	$scope.prevPage = function(){
+		var location = $scope.current;
+		var ret = {arc: false, chapter: false, page: false};
+		if(location.page < $scope.comics.arcs[location.arc].chapters[location.chapter].pages.length - 1){
+			ret.arc = Number(location.arc);
+			ret.chapter = Number(location.chapter);
+			ret.page = Number(location.page + 1);
+			return ret;
+		}else{
+			if(location.chapter < $scope.comics.arcs[location.arc].chapters.length - 1){
+				ret.arc = Number(location.arc);
+				ret.chapter = Number(location.chapter + 1);
+				ret.page = Number($scope.comics.arcs[ret.arc].chapters[ret.chapter].pages.length - 1);
+				return ret;
+			}else if(location.arc < $scope.comics.arcs.length - 1){
+				ret.arc = Number(location.arc + 1);
+				ret.chapter = Number($scope.comics.arcs[ret.arc].chapters.length - 1);
+				ret.page = Number($scope.comics.arcs[ret.arc].chapters[ret.chapter].pages.length - 1);
+				return ret;
+			}else{
+				return false;
+			}
+		}
+	}
+	//last possible page
+	$scope.first = function(){
+		var arc = $scope.comics.arcs.length - 1;
+		var chapter = $scope.comics.arcs[arc].chapters.length - 1;
+		var page = $scope.comics.arcs[arc].chapters[chapter].pages.length - 1;
+		return {arc: arc, chapter: chapter, page: page};
+	}
+	//turn a comic vector into a meaningful link
+	$scope.formLink = function(vector){
+		if(vector != false){
+			return '#/comics/'+vector.arc+'/'+vector.chapter+'/'+vector.page;
+		}else{
+			return "";
+		}
+	}
+	
+	//keep our links so they are easily accessible from themes
+	$scope.links = {first: $scope.formLink($scope.first()), next: $scope.formLink($scope.nextPage()), prev: $scope.formLink($scope.prevPage()), latest: $scope.formLink($scope.latest())};
+
+	//some helpful debugging
+	/*
+	$log.log($scope.arc);
+	$log.log($scope.chapter);
+	$log.log($scope.page);
+	$log.log($scope.links);
+	*/
+
+});
