@@ -1,14 +1,18 @@
 <div class="row">
-	<h1 ng-show="arc.title">{{arc.title}}</h1>
-	<h2 ng-show="chapter.title">{{chapter.title}}</h2>
-	<h3 ng-show="page.title">{{page.title}}</h3>
-	<div class="col-md-8 col-md-offset-2" id="main">
+	<div class="col-md-8" id="main">
+		<h2 class="text-center" ng-show="page.title">{{page.title}}</h2>
+		<h4 class="text-center" ng-show="chapter.title">{{chapter.title}}</h4>
+		<h5 class="text-center" ng-show="arc.title">{{arc.title}}</h5>
 		<div class="row">
 			<div class="col-xs-3"><a id="firstbtn" class="btn btn-default btn-block" ng-href="{{links.first}}">&lt;&lt;</a></div>
 			<div class="col-xs-3"><a id="nextbtn" class="btn btn-default btn-block" ng-class="{disabled:!links.prev}" ng-href="{{links.prev}}">&lt;</a></div>
 			<div class="col-xs-3"><a id="prevbtn" class="btn btn-default btn-block" ng-class="{disabled:!links.next}" ng-href="{{links.next}}">&gt;</a></div>
 			<div class="col-xs-3"><a id="latestbtn" class="btn btn-default btn-block" ng-href="{{links.latest}}">&gt;&gt;</a></div>
-			<div class="col-md-12"><img ng-src="{{page.image}}"></div>
+			<div class="col-md-12"><img class="img-responsive" ng-src="{{page.image}}"></div>
 		</div>
+	</div>
+	<div class="col-md-4 text-right" id="archive">
+		<h2 class="text-center">Archive</h2>
+		<p ng-repeat="entry in archive"><a ng-href="{{entry.link}}" ng-class="{page:entry.type=='page', chapter:entry.type=='chapter', arc:entry.type=='arc'}">{{entry.title}}</a></p>
 	</div>
 </div>

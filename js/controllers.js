@@ -103,15 +103,61 @@ angular.module('micro').controller('pages', function($scope, $routeParams, $log)
 	//turn a comic vector into a meaningful link
 	$scope.formLink = function(vector){
 		if(vector != false){
+			if(!vector.arc){
+				vector.arc = 0;
+			}
+			if(!vector.chapter){
+				vector.chapter = 0;
+			}
+			if(!vector.page){
+				vector.page = 0;
+			}
 			return '#/comics/'+vector.arc+'/'+vector.chapter+'/'+vector.page;
 		}else{
 			return "";
 		}
 	}
+
+	//generates the archive object
+	//I apologize - this is some pretty scary code
+	$scope.buildArchiveDescending = function(){
+		var archive = [];
+		for(var a = 0; a < $scope.comics.arcs.length; a++){
+			var vector = {arc:a, chapter: $scope.comics.arcs[a].chapters.length-1, page: $scope.comics.arcs[a].chapters[$scope.comics.arcs[a].chapters.length-1].pages.length-1}
+			archive.push({type: 'arc', vector: vector, link: $scope.formLink(vector), title: $scope.comics.arcs[a].title});
+			for(var c = 0; c < $scope.comics.arcs[a].chapters.length;c++){
+				var vector = {arc:a, chapter:c, page: $scope.comics.arcs[a].chapters[c].pages.length-1}
+				archive.push({type: 'chapter', vector: vector, link: $scope.formLink(vector), title: $scope.comics.arcs[a].chapters[c].title});
+				for(var p = 0; p < $scope.comics.arcs[a].chapters[c].pages.length;p++){
+					var vector = {arc:a, chapter: $scope.comics.arcs[a].chapters[c], page: $scope.comics.arcs[a].chapters[c].pages[p]}
+					archive.push({type: 'page', vector: vector, link: $scope.formLink(vector), title: $scope.comics.arcs[a].chapters[c].pages[p].title});
+				}
+			}
+		}
+		return archive;
+	}
+
+	$scope.buildArchiveAscending = function(){
+		var archive = [];
+		for(var a = $scope.comics.arcs.length-1; a >= 0; a--){
+			var vector = {arc:a, chapter: $scope.comics.arcs[a].chapters.length-1, page: $scope.comics.arcs[a].chapters[$scope.comics.arcs[a].chapters.length-1].pages.length-1}
+			archive.push({type: 'arc', vector: vector, link: $scope.formLink(vector), title: $scope.comics.arcs[a].title});
+			for(var c = $scope.comics.arcs[a].chapters.length-1; c >= 0; c--){
+				var vector = {arc:a, chapter:c, page: $scope.comics.arcs[a].chapters[c].pages.length-1}
+				archive.push({type: 'chapter', vector: vector, link: $scope.formLink(vector), title: $scope.comics.arcs[a].chapters[c].title});
+				for(var p = $scope.comics.arcs[a].chapters[c].pages.length - 1; p >= 0 ;p--){
+					var vector = {arc:a, chapter: c, page: p}
+					archive.push({type: 'page', vector: vector, link: $scope.formLink(vector), title: $scope.comics.arcs[a].chapters[c].pages[p].title});
+				}
+			}
+		}
+		return archive;
+	}
 	
 	//keep our links so they are easily accessible from themes
 	$scope.links = {first: $scope.formLink($scope.first()), next: $scope.formLink($scope.nextPage()), prev: $scope.formLink($scope.prevPage()), latest: $scope.formLink($scope.latest())};
-
+	$scope.archive = $scope.buildArchiveAscending();
+	$log.log($scope.archive);
 	//some helpful debugging
 	/*
 	$log.log($scope.arc);

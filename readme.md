@@ -113,6 +113,19 @@ This is the current location.
 
 Locations behaves as a descending array.  That means 0 is the latest, 1 is the next to latest, and 2 is two comics in the past.  Therefore, the latest page will always be [0,0,0], while the first may be [1,2,1] or [5, 5, 7] or so on.  [0,\*,\*] maps to the latest Arc, [0,0,\*] to the latest chapter, and so on.
 
+###Archive###
+This is the list of all arcs, chapters and comics.  You should use a ng-repeat="entry in archive" to unwind it.  Each entry contains the following:
+
+    entry.title - Title
+    entry.type - Either 'arc' 'chapter' or 'page'
+    entry.link - A link to the entry
+    entry.vector - A comic vector
+
+####Changing Archive from Ascending to Descending####
+Modify line 159 to read:
+
+    $scope.archive = $scope.buildArchiveDescending();
+
 ##Adding to Arcs, Chapters, and Pages##
 The configuration objects are never stripped, and the Arc, Chapter and Page objects simply act as pointers within the Comics array.  Therefore, if you add additional fields to the config, they'll be available to the Arc, Chapter and Page objects as appropriate.  You could add in support for alt tags, descriptions, and so on.
 
